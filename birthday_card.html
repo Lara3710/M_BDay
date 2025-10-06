@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .envelope-wrapper {
+            position: relative;
+            width: 400px;
+            height: 280px;
+            cursor: pointer;
+            transition: all 1.5s ease;
+            z-index: 10;
+        }
+
+        .envelope-wrapper:hover:not(.opened) {
+            transform: scale(1.05);
+        }
+
+        .envelope-wrapper.opened {
+            transform: translateY(150vh);
+            opacity: 0;
+        }
+
+        .envelope {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .envelope-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: #f4e4c1;
+            border: 3px solid #d4a574;
+            z-index: 1;
+        }
+
+        .envelope-front {
+            position: absolute;
+            width: 100%;
+            height: 50%;
+            background: #f4e4c1;
+            border: 3px solid #d4a574;
+            border-bottom: none;
+            top: 0;
+            transform-origin: top;
+            transition: transform 1s ease;
+            z-index: 3;
+            clip-path: polygon(0 0, 50% 100%, 100% 0);
+        }
+
+        .envelope-wrapper.opened .envelope-front {
+            transform: rotateX(180deg);
+        }
+
+        .card {
+            position: fixed;
+            width: 600px;
+            max-width: 90vw;
+            height: auto;
+            min-height: 400px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 50px 40px;
+            text-align: center;
+            opacity: 0;
+            transition: all 1s ease;
+        }
+
+        .card.show {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
+        .card h1 {
+            font-size: 52px;
+            color: #667eea;
+            margin-bottom: 30px;
+            opacity: 0;
+            transition: opacity 0.8s ease 0.5s;
+        }
+
+        .card.show h1 {
+            opacity: 1;
+        }
+
+        .card p {
+            font-size: 20px;
+            color: #333;
+            line-height: 1.8;
+            opacity: 0;
+            transition: opacity 0.8s ease 0.8s;
+        }
+
+        .card.show p {
+            opacity: 1;
+        }
+
+        .balloon {
+            position: fixed;
+            width: 70px;
+            height: 85px;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            opacity: 0;
+            z-index: 4;
+        }
+
+        .balloon::before {
+            content: '';
+            position: absolute;
+            width: 2px;
+            height: 100px;
+            background: rgba(0,0,0,0.15);
+            top: 85px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .balloon::after {
+            content: '▲';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: inherit;
+            font-size: 10px;
+        }
+
+        .balloon.show {
+            animation: floatUp 4s ease-out forwards, sway 3s ease-in-out infinite;
+            opacity: 0.95;
+        }
+
+        .balloon1 { background: #ff6b6b; left: 10%; }
+        .balloon2 { background: #4ecdc4; left: 20%; }
+        .balloon3 { background: #ffe66d; left: 35%; }
+        .balloon4 { background: #a8e6cf; right: 35%; }
+        .balloon5 { background: #ff8b94; right: 20%; }
+        .balloon6 { background: #95e1d3; right: 10%; }
+
+        .balloon1.show { animation-delay: 1.5s, 1.5s; }
+        .balloon2.show { animation-delay: 1.7s, 1.7s; }
+        .balloon3.show { animation-delay: 1.9s, 1.9s; }
+        .balloon4.show { animation-delay: 2.1s, 2.1s; }
+        .balloon5.show { animation-delay: 2.3s, 2.3s; }
+        .balloon6.show { animation-delay: 2.5s, 2.5s; }
+
+        @keyframes floatUp {
+            from {
+                bottom: -150px;
+            }
+            to {
+                bottom: 60%;
+            }
+        }
+
+        @keyframes sway {
+            0%, 100% { 
+                transform: translateX(-20px) rotate(-5deg); 
+            }
+            50% { 
+                transform: translateX(20px) rotate(5deg); 
+            }
+        }
+
+        .confetti {
+            position: fixed;
+            width: 12px;
+            height: 12px;
+            z-index: 6;
+            opacity: 0;
+        }
+
+        .confetti.show {
+            animation: confettiFall 3s ease-out forwards;
+            opacity: 1;
+        }
+
+        @keyframes confettiFall {
+            0% {
+                top: -10%;
+                transform: translateY(0) rotateZ(0deg);
+            }
+            100% {
+                top: 110%;
+                transform: translateY(100vh) rotateZ(720deg);
+            }
+        }
+
+        .hint {
+            position: absolute;
+            bottom: 50px;
+            color: white;
+            font-size: 20px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            animation: pulse 2s ease-in-out infinite;
+            opacity: 1;
+            transition: opacity 0.5s;
+            z-index: 9;
+        }
+
+        .hint.hide {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { 
+                opacity: 0.7;
+                transform: scale(1);
+            }
+            50% { 
+                opacity: 1;
+                transform: scale(1.05);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="envelope-wrapper" id="envelopeWrapper">
+            <div class="envelope">
+                <div class="envelope-back"></div>
+                <div class="envelope-front"></div>
+            </div>
+        </div>
+
+        <div class="card" id="card">
+            <h1>Happy Birthday!🎉</h1>
+            <p>
+                Grattissss Bästa Mernaaa
+                <br><br>
+                Nu är du äntligen 19 hoppas du kommer ha bästa året
+                <br><br>
+                Hoppas att vi ses detta året nu för kommer alltid sakna dig bästa systern
+                <br><br>
+                Grattis! 🎉🎉🎉
+            </p>
+        </div>
+
+        <div class="balloon balloon1"></div>
+        <div class="balloon balloon2"></div>
+        <div class="balloon balloon3"></div>
+        <div class="balloon balloon4"></div>
+        <div class="balloon balloon5"></div>
+        <div class="balloon balloon6"></div>
+
+        <div class="hint" id="hint">Click the envelope! ✉️</div>
+    </div>
+
+    <script>
+        const envelopeWrapper = document.getElementById('envelopeWrapper');
+        const card = document.getElementById('card');
+        const hint = document.getElementById('hint');
+        const balloons = document.querySelectorAll('.balloon');
+        
+        envelopeWrapper.addEventListener('click', function() {
+            if (!this.classList.contains('opened')) {
+                // Hide hint
+                hint.classList.add('hide');
+                
+                // Open envelope and make it disappear
+                this.classList.add('opened');
+                
+                // Show card after a delay
+                setTimeout(() => {
+                    card.classList.add('show');
+                }, 800);
+                
+                // Show balloons
+                setTimeout(() => {
+                    balloons.forEach(balloon => {
+                        balloon.classList.add('show');
+                    });
+                }, 1200);
+                
+                // Create confetti
+                setTimeout(() => {
+                    createConfetti();
+                }, 1500);
+            }
+        });
+
+        function createConfetti() {
+            const colors = ['#ff6b6b', '#4ecdc4', '#ffe66d', '#a8e6cf', '#ff8b94', '#dfe6e9', '#95e1d3', '#feca57'];
+            const container = document.querySelector('.container');
+            
+            for (let i = 0; i < 80; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = '0s';
+                    confetti.style.animationDuration = (Math.random() * 2 + 2.5) + 's';
+                    confetti.classList.add('show');
+                    container.appendChild(confetti);
+                    
+                    // Remove confetti after animation
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 5000);
+                }, i * 30);
+            }
+        }
+    </script>
+</body>
+</html>
